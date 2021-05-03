@@ -1,5 +1,7 @@
+import 'package:clima/screens/location_screen.dart';
+import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -10,40 +12,30 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
   }
 
-  void getLocation() async {
-    LocationPermission permission;
+  void getLocationData() async {
+    WeatherModel weatherModel = WeatherModel();
+    var weatherData = await weatherModel.getLocationWeather();
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('Permission was denied.');
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      print('Permission was denied forever.');
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print(position);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LocationScreen(
+            locationWeather: weatherData,
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-    String myMargin = 'abc';
-
-    double myMarginAsDouble = double.parse(myMargin);
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.all(myMarginAsDouble ?? 30.0),
-        color: Colors.red,
+      body: Center(
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 100.0,
+        ),
       ),
     );
   }
